@@ -21,16 +21,19 @@
         }
 
         function login($email){
-            $query = "SELECT `id` FROM `users` WHERE `email` = ".$email;
-            $array = Select($query);
-            var_dump($array);
-            //$array = ['1' => 'uzer1874@rambler.ru', '2' => 'semlena1812@yandex.ru'];
-		    foreach($array as $key => $value){
-			    if($email === $value){
-				    return $key;
-				}
-			}
-			return false;
+             $query = "SELECT `id` FROM `users` WHERE `email`='$email'";
+             $par =['email',$email];
+             $array = Select($query,$par);
+             //print_r($array[0][0]);
+             if(!$array){
+                 //echo 'Что-то пошло не так, попробуйте еще раз';
+                 return false;
+             } else {
+                 $array = $array[0][0];
+                 echo $array['id'];
+                 return $array['id'];
+             }
+
 		}
 
 
@@ -42,13 +45,12 @@
                 'appt' => '-'.$array['appt'], 'floor' => '-'.$array['floor']];
                  $adress = implode(' ', $adress);
                  if (isset($array['callback'])) {
-                     $callback === true;
+                      $callback === true;
                  } else {
-                    $callback === false;
+                      $callback === false;
                  }
                   $payment = $array['payment'];
-
-                 $order = ['adress' => $adress, 'comment' => $_REQUEST['comment'], 'callback' => $callback, 'payment' => $payment];
+                  $order = ['adress' => $adress, 'comment' => $_REQUEST['comment'], 'callback' => $callback, 'payment' => $payment];
             }
             $arr = [$order, $user,$adress];
             return $arr;
@@ -87,6 +89,10 @@
                  hello($id,$name);
 
                  $arr = data($array);
+                 print_r($arr);
+                 if(!emptry($arr['order'])){
+                      Insert('order',$arr['order']);
+                 }
 
                  $mail = letter_to_send($email,$adress, $num,$name);
 
@@ -108,7 +114,6 @@
          $adress = $arr[2];
          $num = 4;
          start($res,$email,$adress,$name,$num);
-
 
 
 
