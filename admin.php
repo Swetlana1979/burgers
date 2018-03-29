@@ -1,19 +1,21 @@
 <?php
 require_once('mysql.php');
-//$user = ['0' => ['name' => 'Светлана','email' => 'uzer1874@rambler.ru', 'phone' => '89508104196'],'1' => ['name' => 'Елена','email' => 'semlena1812@yandex.ru', 'phone'=>'89225285141']];//Slect_all('users');
-//$order =['0' =>['id_user' => '0','adress'=>'прлллллллллллллл', 'comment' => 'комент хороший', 'payment' => 'card', 'callback' => 'да']]; //Slect_all('orders');
-$query ="SELECT * FROM `orders` WHERE 1";
+
+$query = "SELECT * FROM `orders` WHERE 1";
 $par =" ";
-$query1 ="SELECT * FROM `users` WHERE 1";
-$par =" ";
+$query1 = "SELECT * FROM `users` WHERE 1";
+
 $order = Select($query,$par);
 $order = $order[0];
-//print_r($order);
+//var_dump($order);
 $user = Select($query1,$par);
 $user = $user[0];
-foreach ($order as $key => $value){
-    if($value['id_user'] === $user[$key]['id']){
-        $order[$key]['id_user'] = $user[$key]['name'];
+//var_dump($user);
+if($order !== NULL){
+    foreach ($order as $key => $value){
+        if($value['id_user'] === $user[$key]['id']){
+            $order[$key]['id_user'] = $user[$key]['name'];
+        }
     }
 }
 function print_all($array,$array2){
@@ -48,9 +50,17 @@ function print_all($array,$array2){
 echo '<div style="text-align: center;">'.'<br>';
 $array = ['№','имя','емайл','телефон'];
 echo 'Список зарегистрированных пользователей';
-print_all($user,$array);
+if($user!== NULL){
+    print_all($user,$array);
+} else {
+    echo "Нет зарегистрированных пользователей";
+}
 echo '</div>';
 $array = ['номер заказа','пользователь','aдресс','комментарий','оплата','перезвонить'];
 
 echo 'Список заказов';
-print_all($order,$array);
+if($order!== NULL){
+    print_all($order,$array);
+} else {
+    echo "Нет заказов";
+}

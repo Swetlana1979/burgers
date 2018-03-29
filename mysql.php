@@ -16,7 +16,7 @@ function Select($query,$par){
     if($db) {
         //$qry = "SELECT * FROM users";
         $data = $db->prepare($query);
-        $data->execute(/*[$par]*/);
+        $data->execute([$par]);
 
         while ($row = $data->fetchAll()) {
             $arr[] = $row;
@@ -28,25 +28,26 @@ function Select($query,$par){
 
 }
 
-function Insert ($table, $array)
+function Insert ($sql)
 {
 
     $db = getConnection();
     if ($db) {
-        foreach ($array as $key => $value) {
-            echo $key = $value;
-        }
-        /*$query = "INSERT INTO `orders`(`id`, `id_user`, `adress`, `comment`, `payment`, `collback`) VALUES ()";
-        $data = $db->prepare($query);
-        $data->execute($array);
 
-        while ($row = $data->fetchAll()) {
-            $arr[] = $row;
+
+
+        try {
+
+            $statement = $db->prepare($sql);
+            $statement->execute();
+        }catch (PDOException $e) {
+            echo "Ошибка: ".$e->getMessage()."<br>";
+            echo "На линии: ".$e->getLine();
         }
-        return $arr;
+
     }else{
         echo 'Соединение не установлено';
-    }*/
-
     }
+
 }
+
