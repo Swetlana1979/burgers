@@ -1,3 +1,15 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Главная страница
+    </title>
+    <!--<link rel="stylesheet" href="./css/vendors.min.css">-->
+    <link rel="stylesheet" href="../css/main.min.css">
+  </head>
+  <body>
 <?php
 require_once('mysql.php');
 
@@ -7,15 +19,16 @@ $query1 = "SELECT * FROM `users` WHERE 1";
 
 $order = Select($query,$par);
 $order = $order[0];
-//var_dump($order);
+
 $user = Select($query1,$par);
 $user = $user[0];
-//var_dump($user);
+
 if($order !== NULL){
     foreach ($order as $key => $value){
-        if($value['id_user'] === $user[$key]['id']){
-            $order[$key]['id_user'] = $user[$key]['name'];
-        }
+	    
+		    $id=$value['id_user']-1;
+            $order[$key]['id_user'] = $user[$id]['name'];
+		
     }
 }
 function print_all($array,$array2){
@@ -48,7 +61,7 @@ function print_all($array,$array2){
 }
 
 echo '<div style="text-align: center;">'.'<br>';
-$array = ['№','имя','емайл','телефон'];
+$array = ['№','емайл','имя','телефон'];
 echo 'Список зарегистрированных пользователей';
 if($user!== NULL){
     print_all($user,$array);
@@ -56,11 +69,21 @@ if($user!== NULL){
     echo "Нет зарегистрированных пользователей";
 }
 echo '</div>';
-$array = ['номер заказа','пользователь','aдресс','комментарий','оплата','перезвонить'];
-
+$array = ['номер заказа','заказчик','aдресс','комментарий'];
+foreach ($order as $key => $value) {
+    unset($order[$key]['payment']);
+	unset($order[$key][4]);
+    unset($order[$key]['collback']);
+	unset($order[$key][5]);
+}
+//unset($order[0]['collback']);
+//print_r($order);
 echo 'Список заказов';
 if($order!== NULL){
     print_all($order,$array);
 } else {
     echo "Нет заказов";
 }
+?>
+</body>
+</html>
