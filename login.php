@@ -26,16 +26,18 @@ function login($email)
     $array = Select($query, $par);
 
     if (!$array) {
-        $query = "SELECT COUNT(`id`) FROM `users` WHERE 1";
+        /*$query = "SELECT COUNT(`id`) FROM `users` WHERE 1";
         $par = [];
         $id = Select($query, $par);
-        $id = $id[0][0]["COUNT(`id`)"];
-        $id = $id + 1;
+
+        $id = $id[0]["COUNT(`id`)"];
+        $id = $id + 1;*/
+        $id = false;
         $bool = false;
     } else {
-        $array = $array[0][0];
+        $array = $array[0];
         $id = $array['id'];
-        //var_dump($id);
+
         $bool = true;
     }
     return $id_arr = ['id' => $id, 'bool' => $bool];
@@ -44,15 +46,14 @@ function login($email)
 function data($array, $id, $bool)
 {
     if ($array['submit'] === 'Заказать') {
-
         $user = ($bool) ? [] : ['email' => $array['email'], 'name' => $array['name'], 'phone' => $array['phone']];
-        $adress = ['street' => 'ул ' . $array['street'], 'home' => 'д ' . $array['home'], 'part' => ' ' . $array['part'],
-            'appt' => ' ' . $array['appt'], 'floor' => ' ' . $array['floor']];
+        $adress = ['street' => 'ул ' . $array['street'], 'home' => 'д ' . $array['home'], 'part' => $part = (!empty($array['part'])) ? 'кор. ' . $array['part'] : " ",
+            'appt' => 'кв. ' . $array['appt'], 'floor' => 'эт. ' . $array['floor']];
         $adress = implode(' ', $adress);
-        if (isset($array['callback'])) {
-            $callback === true;
+        if (($array['callback']) === 'on') {
+            $callback = true;
         } else {
-            $callback === false;
+            $callback = false;
         }
         $payment = $array['payment'];
         $order = ['id_user' => $id, 'adress' => $adress, 'comment' => $_REQUEST['comment'], 'payment' => $payment, 'callback' => $callback];
@@ -65,7 +66,7 @@ function letter_to_send($email, $adress, $num, $name)
 {
     $text = ($num > 1) ? 'Спасибо, это ваш ' . $num . '-й заказ' : 'Спасибо, это ваш первый заказ';
     $message = 'Здравствуйте,' . $name . '. Ваш заказ будет доставлен по адресу: ' . $adress . ' DarkBeefBurger за 500 рублей, 1 шт ' . $text;
-    $message = wordwrap($message, 70, "\r\n");
+    $message = wordwrap($message, 150, "\r\n");
     $header = 'Заказ №' . $num;
     $file = 'email/mail.txt';
     $date = date('Y-m-d h:i:s');
@@ -88,14 +89,14 @@ function hello($bool, $name)
 function num_order($id, $bool)
 {
     if ($bool) {
-        $query = "SELECT COUNT(`id_user`) FROM `orders` WHERE `id_user` = '$id'";
+        $query = "SELECT COUNT(`id_user`) FROM `orders` WHERE `id_user`= $id";
         $par = ['id', $id];
         $num = Select($query, $par);
-        $num = $num[0][0]["COUNT(`id_user`)"];
-        //var_dump($num);
+		$num = $num[0]["COUNT(`id_user`)"];
     } else {
         $num = 0;
     }
+	echo $num;
     return $num = $num + 1;
 }
 
@@ -110,26 +111,6 @@ function start($res, $email, $adress, $name)
         $arr = data($_REQUEST, $id, $bool);
 
         $adress = $arr[2];
-
-        if (!empty($arr[0])) {
-            $array = $arr[0];
-            foreach ($array as $value) {
-                $array[] = $value;
-
-            }
-
-
-            $id_user = $array[0];
-            $adress = $array[1];
-            $comment = $array[2];
-            $payment = $array[3];
-            $collback = $array[4];
-            $sql = "INSERT INTO `orders`( `id_user`, `adress`, `comment`, `payment`, `collback`) VALUES ($id_user,'$adress','$comment','$payment','$collback')";
-
-            Insert($sql);
-
-        }
-
         if (!empty($arr[1])) {
             $arr1 = $arr[1];
             foreach ($arr1 as $value) {
@@ -142,6 +123,31 @@ function start($res, $email, $adress, $name)
             $sql1 = "INSERT INTO `users`(`email`, `name`, `phone`) VALUES ('$email','$name','$phone')";
             Insert($sql1);
         }
+
+        if (!empty($arr[0])) {
+            $array = $arr[0];
+            foreach ($array as $value) {
+                $array[] = $value;
+
+            }
+            if ($array[0]) {
+                $id_user = $array[0];
+            } else {
+                $id_user = Select("SELECT `id` FROM `users` WHERE `email`='$email'", [['email', $email]]);
+                $id_user = $id_user[0]['id'];
+            }
+
+            $adress = $array[1];
+            $comment = $array[2];
+            $payment = $array[3];
+            $collback = $array[4];
+            $sql = "INSERT INTO `orders`( `id_user`, `adress`, `comment`, `payment`, `collback`) VALUES ($id_user,'$adress','$comment','$payment','$collback')";
+
+            Insert($sql);
+
+        }
+
+
         $mail = letter_to_send($email, $adress, $num, $name);
 
 

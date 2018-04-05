@@ -14,11 +14,10 @@ function Select($query, $par)
 
     $db = getConnection();
     if ($db) {
-        //$qry = "SELECT * FROM users";
         $data = $db->prepare($query);
         $data->execute([$par]);
 
-        while ($row = $data->fetchAll()) {
+        while ($row = $data->fetch()) {
             $arr[] = $row;
         }
         return $arr;
@@ -30,11 +29,8 @@ function Select($query, $par)
 
 function Insert($sql)
 {
-
     $db = getConnection();
     if ($db) {
-
-
         try {
 
             $statement = $db->prepare($sql);

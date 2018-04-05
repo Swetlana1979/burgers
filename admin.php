@@ -18,19 +18,27 @@ $par = " ";
 $query1 = "SELECT * FROM `users` WHERE 1";
 
 $order = Select($query, $par);
-$order = $order[0];
-
 $user = Select($query1, $par);
-$user = $user[0];
 
-if ($order !== NULL) {
+
+if ($order !== NULL && $user !== NULL) {
+    foreach ($user as $key => $value) {
+        $array[$value['id']] = $value['name'];
+    }
+
     foreach ($order as $key => $value) {
 
-        $id = $value['id_user'] - 1;
-        $order[$key]['id_user'] = $user[$id]['name'];
+        $id = $value['id_user'];
+        $id1 = $id - 1;
+
+
+        $order[$key]['id_user'] = $array[$id];
 
     }
 }
+
+
+
 function print_all($array, $array2)
 {
 
@@ -77,8 +85,7 @@ foreach ($order as $key => $value) {
     unset($order[$key]['collback']);
     unset($order[$key][5]);
 }
-//unset($order[0]['collback']);
-//print_r($order);
+
 echo 'Список заказов';
 if ($order !== NULL) {
     print_all($order, $array);
