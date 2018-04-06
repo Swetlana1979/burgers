@@ -26,18 +26,11 @@ function login($email)
     $array = Select($query, $par);
 
     if (!$array) {
-        /*$query = "SELECT COUNT(`id`) FROM `users` WHERE 1";
-        $par = [];
-        $id = Select($query, $par);
-
-        $id = $id[0]["COUNT(`id`)"];
-        $id = $id + 1;*/
         $id = false;
         $bool = false;
     } else {
         $array = $array[0];
         $id = $array['id'];
-
         $bool = true;
     }
     return $id_arr = ['id' => $id, 'bool' => $bool];
@@ -96,7 +89,7 @@ function num_order($id, $bool)
     } else {
         $num = 0;
     }
-	echo $num;
+	
     return $num = $num + 1;
 }
 
